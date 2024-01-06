@@ -44,7 +44,8 @@ pipeline {
         }
         stage ('Test'){
             steps{
-                sh "pytest testRoutes.py"
+                //sh "pytest testRoutes.py"
+                sh "/path/to/venv/bin/pytest testRoutes.py"
             }
         }
 

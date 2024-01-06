@@ -2,7 +2,7 @@ def img
 
 pipeline {
     environment {
-        registry = "theoexpleo/jenkins-cicd:flask"
+        registry = "theoexpleo/jenkins-cicd"
         registryCredential = 'DOCKERHUB'
         githubCredential = 'GITHUB'
         dockerImage = ''
@@ -11,27 +11,12 @@ pipeline {
     stages {
         stage ('checkout'){
             steps {
-                git branch: 'main'
+                git branch: 'main',
                 credentialsId: githubCredential,
-                url: ''
+                url: 'https://github.com/Centric205/JenPy.git'
             }
         } 
-
-        stage ('Test'){
-            steps{
-                sh "pytest testRoutes.py"
-            }
-        }
-
-        stage ('Clean Up'){
-            steps{
-                sh returnStatus: true, script: 'docker stop $(docker ps -a | grep ${JOB_NAME} | awk \'{print $1}\')'
-                // This will delete all images
-                sh returnStatus: true, script: 'docker rmi $(docker images | grep ${registry} | awk \'{print $3}\') --force' 
-                sh returnStatus: true, script: 'docker rm ${JOB_NAME}'
-            }
-        }
-
+        
         stage ('Build Image'){
             steps {
                 script {
@@ -57,6 +42,21 @@ pipeline {
                 sh label: '', script: "docker run -d --name ${JOB_NAME} -p 5000:5000 ${img}"
             }
         }
+        stage ('Test'){
+            steps{
+                sh "pytest testRoutes.py"
+            }
+        }
+
+        stage ('Clean Up'){
+            steps{
+                sh returnStatus: true, script: 'docker stop $(docker ps -a | grep ${JOB_NAME} | awk \'{print $1}\')'
+                // This will delete all images
+                sh returnStatus: true, script: 'docker rmi $(docker images | grep ${registry} | awk \'{print $3}\') --force' 
+                sh returnStatus: true, script: 'docker rm ${JOB_NAME}'
+            }
+        }
+
     }
 
 }

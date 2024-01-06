@@ -44,6 +44,7 @@ pipeline {
         }
         stage ('Test'){
             steps{
+                sh "source /venv/bin/activate"
                 sh "pytest testRoutes.py"
             }
         }
